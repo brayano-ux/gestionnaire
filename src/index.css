@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  DaisyUI is configured in tailwind.config.js as a plugin.
+  Keep global CSS here; custom CSS variables or overrides can go under :root if needed.
+*/
+
+/* Example: custom root variables (optional)
+:root {
+  --my-accent: theme('colors.pink.400');
+}
+*/
