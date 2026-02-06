@@ -19,25 +19,30 @@ Application web progressive (PWA) pour gérer les commandes et factures avec sup
 ### En tant que PWA (Recommandé)
 
 **Sur navigateur desktop :**
+
 1. Ouvrez [gestionnaire-dmib.vercel.app](https://gestionnaire-dmib.vercel.app)
 2. Cliquez sur l'icône **Installer** (en haut à droite) ou l'adresse
 3. Sélectionnez **"Installer l'app"**
 
 **Sur téléphone Android :**
+
 1. Ouvrez l'app dans Chrome
 2. Tapez le menu (3 points) → **"Installer l'app"**
 
 **Sur iPhone/iPad :**
+
 1. Ouvrez l'app dans Safari
 2. Tapez **Partager** → **"Sur l'écran d'accueil"**
 
 ## 🔌 Utilisation
 
 ### Avec Internet
+
 - L'app se synchronise avec Firebase en temps réel
 - Les données sont sauvegardées dans le cloud
 
 ### Hors Ligne
+
 - L'app sauvegarde automatiquement en local
 - Un indicateur orange aparaît en bas à gauche
 - Continuez à ajouter des commandes/clients
@@ -82,7 +87,8 @@ vite-project/
 ## 🔐 Sécurité
 
 ### ⚠️ Clés Firebase exposées
-Les clés Firebase sont visibles dans le code (normal pour une app front-end publique). 
+
+Les clés Firebase sont visibles dans le code (normal pour une app front-end publique).
 **Protégez votre backend avec des règles de sécurité Firestore :**
 
 ```javascript
@@ -106,20 +112,24 @@ service cloud.firestore {
 ## 📱 Support Offline
 
 ### Base de données locale
+
 - **IndexedDB** : Stockage persistant sur l'appareil
 - **Service Worker** : Cache des assets
 - **Sync Queue** : File d'attente pour synchronisation
 
 ### Synchronisation
+
 - Automatique quand vous revenez online
 - Manuel si nécessaire (impossible pour l'instant, prévu pour v2)
 
 ## 🌐 Déploiement
 
 ### Vercel (Production)
+
 L'app se redéploie automatiquement à chaque push sur GitHub.
 
 ### Local PWA
+
 ```bash
 npm run build
 npm run preview
@@ -129,14 +139,17 @@ npm run preview
 ## 🐛 Troubleshooting
 
 ### L'app se charge lentement
+
 - Videz le cache du navigateur
 - Forcez le refresh (Ctrl+Shift+R ou Cmd+Shift+R)
 
 ### L'install PWA n'apparaît pas
+
 - Assurez-vous d'être en **HTTPS** (Vercel l'est automatiquement)
 - Utilisez un **navigateur moderne** (Chrome 67+, Firefox 102+, Safari 15.1+, Edge 88+)
 
 ### Les données ne se synchronisent pas
+
 - Vérifiez votre connexion internet
 - Ouvrez la console (F12) pour voir les logs
 - Reconnectez-vous à Firebase si nécessaire

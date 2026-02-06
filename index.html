@@ -5,7 +5,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@latest/dist/full.css" rel="stylesheet" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
     <meta name="theme-color" content="#007bff" />
     <meta name="description" content="Application de gestion de commandes - Fonctionne hors ligne" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -17,41 +17,43 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Register Service Worker FIRST, before React loads -->
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').then(
-            (registration) => {
-              console.log('✅ Service Worker registered:', registration);
-              
-              registration.addEventListener('updatefound', () => {
-                const newWorker = registration.installing;
-                if (newWorker) {
-                  newWorker.addEventListener('statechange', () => {
-                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                      console.log('🔄 New version available');
-                      // Show update notification
-                      const message = document.createElement('div');
-                      message.style.cssText = `
-                        position: fixed; bottom: 20px; right: 20px; 
-                        background: #007bff; color: white; padding: 15px 20px;
-                        border-radius: 8px; z-index: 9999;
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                      `;
-                      message.innerHTML = '🔄 Une nouvelle version est disponible! <button onclick="window.location.reload()" style="margin-left: 10px; padding: 5px 10px; background: white; color: #007bff; border: none; border-radius: 4px; cursor: pointer;">Mettre à jour</button>';
-                      document.body.appendChild(message);
+        // Register immediately
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then(registration => {
+            console.log('✅ Service Worker registered:', registration);
+            
+            // Check for updates periodically
+            setInterval(() => {
+              registration.update();
+            }, 60000); // Check every minute
+            
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    console.log('🔄 New version available');
+                    const update = confirm('🔄 Une nouvelle version est disponible!\n\nCliquez OK pour mettre à jour.');
+                    if (update) {
+                      newWorker.postMessage({ type: 'SKIP_WAITING' });
+                      window.location.reload();
                     }
-                  });
-                }
-              });
-            },
-            (error) => {
-              console.log('❌ Service Worker registration failed:', error);
-            }
-          );
-        });
+                  }
+                });
+              }
+            });
+          })
+          .catch(error => {
+            console.error('❌ Service Worker registration failed:', error);
+          });
       }
     </script>
+    
+    <script type="module" src="/src/main.tsx"></script>
   </body>
+
 </html>

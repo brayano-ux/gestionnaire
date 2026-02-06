@@ -1,27 +1,30 @@
 const CACHE_NAME = 'gestionnaire-v1';
 const URLS_TO_CACHE = [
   '/',
-  '/index.html',
-  '/manifest.json'
+  '/index.html'
 ];
 
-// Installation
 self.addEventListener('install', (event) => {
+  console.log('[SW] Installing...');
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(URLS_TO_CACHE);
+      console.log('[SW] Caching app shell');
+      return cache.addAll(URLS_TO_CACHE).catch(() => {
+        console.log('[SW] Cache some URLs failed, continuing...');
+      });
     })
   );
   self.skipWaiting();
 });
 
-// Activation
 self.addEventListener('activate', (event) => {
+  console.log('[SW] Activating...');
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
+            console.log('[SW] Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -31,45 +34,36 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch - Network first, fallback to cache
 self.addEventListener('fetch', (event) => {
-  const { request } = event;
-
-  // Skip POST, PUT, DELETE requests
-  if (request.method !== 'GET') {
+  // Only cache GET requests
+  if (event.request.method !== 'GET') {
     return;
   }
 
   event.respondWith(
-    fetch(request)
+    // Try network first
+    fetch(event.request)
       .then((response) => {
-        // Clone response before caching
-        const clonedResponse = response.clone();
-        
-        // Cache successful responses
-        if (response.status === 200) {
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, clonedResponse);
-          });
+        // Don't cache if not successful
+        if (!response || response.status !== 200 || response.type === 'error') {
+          return response;
         }
-        
+
+        // Clone the response
+        const responseToCache = response.clone();
+
+        // Cache successful responses
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, responseToCache);
+        });
+
         return response;
       })
       .catch(() => {
-        // Fallback to cache
-        return caches.match(request).then((cachedResponse) => {
-          return cachedResponse || new Response('Offline - Page not cached', {
-            status: 503,
-            statusText: 'Service Unavailable'
-          });
+        // Fall back to cache
+        return caches.match(event.request).then((cachedResponse) => {
+          return cachedResponse || new Response('Offline', { status: 503 });
         });
       })
   );
-});
-
-// Handle messages from clients
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
 });
