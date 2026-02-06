@@ -143,7 +143,7 @@ const OrderManagerDemo = () => {
 
   // 🔐 AUTHENTIFICATION FIREBASE
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user: any) => {
       if (user) {
         setIsAuthenticated(true);
         loadDataFromFirebase();
@@ -167,7 +167,7 @@ const OrderManagerDemo = () => {
         getDoc(doc(db, "settings", "shop")),
       ]);
 
-      const ordersData = ordersSnapshot.docs.map((doc) => ({
+      const ordersData = ordersSnapshot.docs.map((doc: any) => ({
         id: doc.id,
         ...doc.data(),
       } as any)) as Order[];
