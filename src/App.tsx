@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import OfflineIndicator from "./components/OfflineIndicator";
 import {
   Plus,
   Package,
@@ -1991,6 +1992,9 @@ Merci pour votre confiance!
           darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
         } border-t mt-8`}
       ></div>
+
+      {/* Offline Indicator */}
+      <OfflineIndicator />
     </div>
   );
 };
